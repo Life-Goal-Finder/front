@@ -10,6 +10,14 @@ import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
   Clock,
   Users,
   User,
@@ -25,10 +33,12 @@ import {
   Image as ImageIcon
 } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 export const Home = () => {
   const { t, i18n } = useTranslation();
   const { authUser } = useAuthContext();
+  const navigate = useNavigate();
   const resultModalRef = useRef<HTMLDivElement>(null);
 
   // State
@@ -51,18 +61,25 @@ export const Home = () => {
   const [proofNote, setProofNote] = useState("");
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAbandonConfirm, setShowAbandonConfirm] = useState(false);
 
   // Fetch categories and active quest
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [catRes, questRes] = await Promise.all([
-          axiosConfig.get("/categories"),
-          axiosConfig.get("/user-goals", { params: { status: "in_progress" } })
-        ]);
+        const catRes = await axiosConfig.get("/categories");
         setCategories(catRes.data);
-        if (questRes.data && questRes.data.length > 0) {
-          setActiveQuest(questRes.data[0]);
+
+        if (authUser) {
+          const questRes = await axiosConfig.get("/user-goals", { params: { status: "in_progress" } });
+          if (questRes.data && questRes.data.length > 0) {
+            setActiveQuest(questRes.data[0]);
+          }
+        } else {
+          const localQuest = localStorage.getItem("guest_active_quest");
+          if (localQuest) {
+            try { setActiveQuest(JSON.parse(localQuest)); } catch (e) {}
+          }
         }
       } catch (err) {
         console.error("Failed to fetch data:", err);
@@ -119,6 +136,20 @@ export const Home = () => {
   // Accept quest
   const handleAccept = async () => {
     if (!spinResult) return;
+    if (!authUser) {
+      const fakeGuestQuest: any = {
+        _id: "guest-quest-" + Date.now(),
+        user_id: "guest",
+        goal_id: spinResult,
+        status: "in_progress",
+        started_at: new Date().toISOString()
+      };
+      setActiveQuest(fakeGuestQuest);
+      localStorage.setItem("guest_active_quest", JSON.stringify(fakeGuestQuest));
+      setShowResult(false);
+      setSpinResult(null);
+      return;
+    }
     try {
       await axiosConfig.post("/roulette/accept", { goal_id: spinResult._id });
       setShowResult(false);
@@ -180,9 +211,22 @@ export const Home = () => {
   };
 
   // Abandon active quest
-  const handleAbandon = async () => {
+  const handleAbandonClick = () => {
     if (!activeQuest) return;
-    if (!window.confirm(t("pages.home.confirm_abandon") as string)) return;
+    setShowAbandonConfirm(true);
+  };
+
+  const handleConfirmAbandon = async () => {
+    if (!activeQuest) return;
+    setShowAbandonConfirm(false);
+
+    if (!authUser) {
+      localStorage.removeItem("guest_active_quest");
+      setActiveQuest(null);
+      setIsCompleting(false);
+      toast.success(t("pages.home.success_abandon"));
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -349,11 +393,18 @@ export const Home = () => {
                 </div>
               ) : (
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button onClick={() => setIsCompleting(true)} size="lg" className="w-full sm:w-auto font-bold py-6 px-8 text-lg shadow-lg hover:shadow-xl transition-all">
-                    <CheckCircle className="h-5 w-5 mr-2" />
-                    {t("pages.home.complete_quest", "Complete Quest")}
-                  </Button>
-                  <Button onClick={handleAbandon} disabled={isSubmitting} variant="destructive" size="lg" className="w-full sm:w-auto font-bold py-6 px-8 text-lg bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground border-destructive/20 shadow-none">
+                  {authUser ? (
+                    <Button onClick={() => setIsCompleting(true)} size="lg" className="w-full sm:w-auto font-bold py-6 px-8 text-lg shadow-lg hover:shadow-xl transition-all">
+                      <CheckCircle className="h-5 w-5 mr-2" />
+                      {t("pages.home.complete_quest", "Complete Quest")}
+                    </Button>
+                  ) : (
+                    <Button onClick={() => navigate("/login")} size="lg" className="w-full sm:w-auto font-bold py-6 px-8 text-lg shadow-lg hover:shadow-xl transition-all border border-primary">
+                      <CheckCircle className="h-5 w-5 mr-2" />
+                      {t("pages.home.login_to_complete", "Se connecter pour terminer")}
+                    </Button>
+                  )}
+                  <Button onClick={handleAbandonClick} disabled={isSubmitting} variant="destructive" size="lg" className="w-full sm:w-auto font-bold py-6 px-8 text-lg bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground border-destructive/20 shadow-none">
                     {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : <XCircle className="h-5 w-5 mr-2" />}
                     {t("pages.home.abandon_quest", "Abandon Quest")}
                   </Button>
@@ -587,8 +638,26 @@ export const Home = () => {
             </div>
           </div>
         )}
-
       </div>
+
+      <Dialog open={showAbandonConfirm} onOpenChange={setShowAbandonConfirm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("pages.home.abandon_quest", "Abandon Quest")}</DialogTitle>
+            <DialogDescription>
+              {t("pages.home.confirm_abandon", "Are you sure you want to abandon this quest? It will be marked as a failure.")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4 gap-2">
+            <Button variant="outline" onClick={() => setShowAbandonConfirm(false)}>
+              {t("global.buttons.cancel", "Cancel")}
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmAbandon}>
+              {t("pages.home.abandon_quest", "Abandon")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -3,7 +3,7 @@ import { ThemeChanger } from "./themeChanger";
 import { LanguageChanger } from "./languageChanger";
 import { useTranslation } from "react-i18next";
 import { Separator } from "../ui/separator";
-import { Home, Trophy, User, Users, LogOut, Menu, X } from "lucide-react";
+import { Home, Trophy, User, Users, LogOut, Menu, X, LogIn, UserPlus } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
@@ -107,6 +107,18 @@ export const Navbar = () => {
       icon: Users,
       auth: !!authUser,
     },
+    {
+      label: t("navbar.login"),
+      path: "/login",
+      icon: LogIn,
+      auth: !authUser,
+    },
+    {
+      label: t("navbar.register", "Register"),
+      path: "/register",
+      icon: UserPlus,
+      auth: !authUser,
+    },
   ];
 
   return (
@@ -173,9 +185,14 @@ export const Navbar = () => {
                   </DropdownMenu>
                 </>
               ) : (
-                <Button onClick={() => navigate("/login")} variant="default">
-                  {t("navbar.login")}
-                </Button>
+                <div className="flex gap-2">
+                  <Button onClick={() => navigate("/login")} variant="ghost">
+                    {t("navbar.login")}
+                  </Button>
+                  <Button onClick={() => navigate("/register")} variant="default">
+                    {t("navbar.register", "Register")}
+                  </Button>
+                </div>
               )}
             </div>
             <Separator orientation="vertical" className="h-8" />

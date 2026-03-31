@@ -46,11 +46,7 @@ export const Router = () => {
       <Route element={<LayoutWrapper />}>
         <Route
           path="/"
-          element={
-            <ProtectedRoute authRequired={true}>
-              <Home />
-            </ProtectedRoute>
-          }
+          element={<Home />}
         />
         <Route
           path="/profile"
@@ -62,11 +58,7 @@ export const Router = () => {
         />
         <Route
           path="/leaderboard"
-          element={
-            <ProtectedRoute authRequired={true}>
-              <Leaderboard />
-            </ProtectedRoute>
-          }
+          element={<Leaderboard />}
         />
         <Route
           path="/friends"

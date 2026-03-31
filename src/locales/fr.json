@@ -11,6 +11,7 @@
     "profile": "Profil",
     "leaderboard": "Classement",
     "friends": "Amis",
+    "register": "S'inscrire",
     "themes": {
       "light": "Clair",
       "dark": "Sombre",
@@ -29,6 +30,7 @@
       "spin": "Tourner la Roue !",
       "your_quest": "Ta Quête !",
       "accept": "Accepter la quête",
+      "login_to_complete": "Se connecter pour terminer",
       "skip": "Passer",
       "customize": "Personnaliser la Roulette",
       "categories": "Catégories",

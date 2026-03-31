@@ -10,7 +10,12 @@ It provides an interactive, gamified "Roulette" interface that challenges users 
 - **TypeScript**: For robust and type-safe components
 - **Tailwind CSS v4 & Radix UI**: Responsive, modern and accessible design system components
 - **Framer Motion**: Smooth spring physics for immersive interface animations
-- **React Router Dom**: Client-side routing
+  - **React Router Dom**: Client-side routing
+
+## 🌟 Key Features
+- **Public Guest Mode**: Unauthenticated users can spin the Roulette and receive quests instantly without registering.
+- **Quest Persistence**: Guest quests are saved locally; progressing to completion naturally prompts registration to save progress and earn points.
+- **Global Leaderboards**: Check the highest scoring users publicly.
 
 ## 📦 Getting Started
 

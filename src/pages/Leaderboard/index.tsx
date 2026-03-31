@@ -62,14 +62,16 @@ export const Leaderboard = () => {
           <Globe className="h-4 w-4" />
           {t("pages.leaderboard.global", "Global")}
         </Button>
-        <Button
-          variant={activeTab === "friends" ? "default" : "outline"}
-          onClick={() => setActiveTab("friends")}
-          className="flex items-center gap-2"
-        >
-          <Users className="h-4 w-4" />
-          {t("pages.leaderboard.friends", "Friends")}
-        </Button>
+        {authUser && (
+          <Button
+            variant={activeTab === "friends" ? "default" : "outline"}
+            onClick={() => setActiveTab("friends")}
+            className="flex items-center gap-2"
+          >
+            <Users className="h-4 w-4" />
+            {t("pages.leaderboard.friends", "Friends")}
+          </Button>
+        )}
       </div>
 
       <Separator className="mb-6" />

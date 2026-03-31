@@ -18,9 +18,9 @@ export const useAxiosInterceptor = () => {
         if (error.response && error.response.status === 401) {
           const path = location.pathname;
 
-          if (path !== "/login" && path !== "/register" && path !== "/register/google") {
+          const publicPaths = ["/login", "/register", "/register/google", "/", "/leaderboard"];
+          if (!publicPaths.includes(path)) {
             setAuthUser(null);
-
             navigate("/login");
           }
         }
