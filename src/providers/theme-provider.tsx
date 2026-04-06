@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-export type Theme = "light" | "dark" | "coral" | "yellow" | "pink" | "lgbt" | "system";
+export type Theme = "brutalist";
 
 type ThemeProviderProps = {
   children: React.ReactNode;
@@ -15,35 +15,21 @@ type ThemeProviderState = {
 };
 
 const initialState: ThemeProviderState = {
-  theme: "system",
+  theme: "brutalist",
   setTheme: () => null,
-  resolvedTheme: "light",
+  resolvedTheme: "brutalist",
 };
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
-const ALL_THEMES: Theme[] = ["light", "dark", "coral", "yellow", "pink", "lgbt"];
+export function ThemeProvider({ children, defaultTheme = "brutalist", storageKey = "sidequest-theme", ...props }: ThemeProviderProps) {
+  const [theme, setTheme] = useState<Theme>("brutalist");
 
-export function ThemeProvider({ children, defaultTheme = "system", storageKey = "sidequest-theme", ...props }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem(storageKey) as Theme) || defaultTheme);
-
-  const resolvedTheme = theme === "system"
-    ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
-    : theme;
+  const resolvedTheme = "brutalist";
 
   useEffect(() => {
     const root = window.document.documentElement;
-
-    // Remove all theme classes
-    root.classList.remove(...ALL_THEMES);
-
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-      root.classList.add(systemTheme);
-      return;
-    }
-
-    root.classList.add(theme);
+    root.className = "";
   }, [theme]);
 
   const value = {

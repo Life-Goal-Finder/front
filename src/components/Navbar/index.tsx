@@ -1,5 +1,4 @@
 import { Link, useNavigate } from "react-router-dom";
-import { ThemeChanger } from "./themeChanger";
 import { LanguageChanger } from "./languageChanger";
 import { useTranslation } from "react-i18next";
 import { Separator } from "../ui/separator";
@@ -123,10 +122,10 @@ export const Navbar = () => {
 
   return (
     <>
-      <div className="sticky top-0 left-0 right-0 z-50 border-b bg-background/80 backdrop-blur-lg">
+      <div className="sticky top-0 left-0 right-0 z-50 border-b-2 border-primary bg-background">
         {/* Desktop */}
-        <div className="hidden select-none md:flex items-center justify-between p-4 px-8 text-accent">
-          <div className="text-2xl font-extrabold tracking-tight">
+        <div className="hidden select-none md:flex items-center justify-between p-4 px-8 text-foreground">
+          <div className="text-2xl font-black tracking-tight uppercase">
             <Link to="/" className="flex items-center gap-2">
               <span className="text-primary">🎯</span>
               {configValues["APP_NAME"] || "Life Goal Finder"}
@@ -198,14 +197,13 @@ export const Navbar = () => {
             <Separator orientation="vertical" className="h-8" />
             <div className="flex items-center justify-between gap-2">
               <LanguageChanger />
-              <ThemeChanger />
             </div>
           </div>
         </div>
 
         {/* Mobile */}
         <div className="flex items-center justify-between p-4 md:hidden">
-          <div className="text-xl font-extrabold text-accent flex items-center gap-2">
+          <div className="text-xl font-black text-foreground uppercase flex items-center gap-2">
             <Link to="/">
               <span className="text-primary">🎯</span> {configValues["APP_NAME"] || "LGF"}
             </Link>
@@ -216,7 +214,7 @@ export const Navbar = () => {
         <div
           ref={menuRef}
           className={cn(
-            "fixed top-0 right-0 w-4/5 h-screen overflow-hidden bg-background transition-transform duration-300 ease-in-out z-20 border-l",
+            "fixed top-0 right-0 w-4/5 h-screen overflow-hidden bg-background transition-transform duration-300 ease-in-out z-20 border-l-2 border-primary",
             isOpen ? "translate-x-0" : "translate-x-full",
           )}
         >
@@ -249,7 +247,6 @@ export const Navbar = () => {
             <Separator />
             <div className="flex items-center justify-center gap-4">
               <LanguageChanger />
-              <ThemeChanger />
             </div>
           </div>
         </div>
